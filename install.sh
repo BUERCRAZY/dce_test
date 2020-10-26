@@ -2,9 +2,6 @@
 yum install -y expect
 echo "start to install DCE automatically"
 
-touch command.sh
-echo 'bash -c "$(docker run -v /var/run/docker.sock:/var/run/docker.sock --rm daocloud.io/daocloud/dce:4.0.2-33456  install ) "' > command.sh
-chmod +x ./command.sh
 
 nums=1
 clair=1
@@ -16,9 +13,11 @@ ovs=1
 calico=1
 storage=1
 login=1
+version="4.0.2-33478"
 
 while [ -n "$1" ]; do
 case $1 in
+  -v)version=$2;shift 2;;
   -p)para=$2;shift 2;;
   -i)vip=$2;shift 2;;
   -r)registry=$2;shift 2;;
@@ -31,6 +30,12 @@ case $1 in
 esac
 done
 echo $para
+
+touch command.sh
+echo 'bash -c "$(docker run -v /var/run/docker.sock:/var/run/docker.sock --rm daocloud.io/daocloud/dce:'$version'  install )"' > command.sh
+chmod +x ./command.sh
+
+
 
 if [ -z $vip ]
 then
@@ -54,9 +59,9 @@ then
   storage=${para:4:1}
   login=${para:5:1}
 
-else
-  echo "please confirm -p option network interface enter correctly"
-  exit
+#else
+#  echo "please confirm -p option network interface enter correctly"
+#  exit
 fi
 
 if [[ $nums -lt 6 && $nums -gt 0 ]]

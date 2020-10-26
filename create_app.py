@@ -97,7 +97,8 @@ def continue_button_2(driver):
     
 
 
-def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', service_type=0, instance_num=1):
+def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', service_type=0, \
+    instance_num=1, cpu_limit=[0.064, 0.128], memory_limit=[256, 256], policy_list=[0,0,[0,0,25,25]]):
     create_action(driver, 1) # n=1 从镜像创建
     # step_content=driver.find_elements_by_class_name('dao-step-content')
     # 创建应用 9 步：0-选择镜像；1-应用信息；2-计算资源；3-网络资源；4-存储资源；5-调度与发布；6-容器配置；7-检查部署 8-存储资源
@@ -119,7 +120,11 @@ def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', s
     continue_button(driver)
     
     # 2-计算资源
-    #
+    compute_info=find_steps_content(driver)[2]
+    if cpu_limit==[0.064, 0.128] and memory_limit==[256, 256]:
+        pass
+    else:
+        compute_info_setting(driver, cpu_limit, memory_limit)
     
     # continue
     continue_button(driver)
@@ -136,7 +141,12 @@ def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', s
     # continue
     continue_button(driver)
     # 5-调度与发布
-    #
+    schedule_info=find_steps_content(driver)[5]
+    schedule_policy, release_plicy, use_percent=policy_list
+    if schedule_policy==0 and release_plicy ==0 and use_percent==[0, 0, 25, 25]:
+        pass
+    else:
+        schedule_info_setting(driver, schedule_policy, release_plicy)
     
     # continue
     continue_button(driver)
