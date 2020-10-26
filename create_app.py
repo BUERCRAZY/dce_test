@@ -39,6 +39,23 @@ def select_template(driver, template_name, choose_template):
     # clear_button.click()  # clear搜索框
 
 
+def create_from_yaml(driver, template_name='dao-2048', app_name='dao-2048-test'):
+    create_action(driver, 2) # n=2 从yaml创建
+    input_area=driver.find_element_by_class_name('dao-popover-rel')
+    input_app_name=input_area.find_element_by_tag_name('input')
+    input_app_name.send_keys(app_name)
+    
+    if template_name=='dao-2048':
+        select_yaml=driver.find_element_by_class_name('mt-sm')
+        yaml_2048=select_yaml.find_element_by_tag_name('a')
+        yaml_2048.click()
+    sleep(10) 
+    deploy_button=driver.find_element_by_class_name('dao-btn.blue')
+    deploy_button.click()
+    
+
+
+
 def create_from_template(driver, template_name='dao-2048', app_name='dao-2048-test'):
     create_action(driver, 0) # n=0 从模版创建
     # 选择模版
