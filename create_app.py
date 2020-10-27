@@ -1,4 +1,3 @@
-from dce_test import *
 from time import sleep
 
 
@@ -98,7 +97,7 @@ def continue_button_2(driver):
 
 
 def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', service_type=0, \
-    instance_num=1, cpu_limit=[0.064, 0.128], memory_limit=[256, 256], policy_list=[0,0,[0,0,25,25]]):
+    instance_num=1, cpu_limit=[0.128, 0.256], memory_limit=[128, 128], policy_list=[0,0,[0,0,25,25]]):
     create_action(driver, 1) # n=1 从镜像创建
     # step_content=driver.find_elements_by_class_name('dao-step-content')
     # 创建应用 9 步：0-选择镜像；1-应用信息；2-计算资源；3-网络资源；4-存储资源；5-调度与发布；6-容器配置；7-检查部署 8-存储资源
@@ -114,7 +113,7 @@ def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', s
     sleep(2)
     # 1-应用信息
     app_info=find_steps_content(driver)[1]
-    app_info_setting(driver, app_info, app_name, service_type, instance_num)
+    app_info_setting(driver, app_info, image_name+app_name, image_name, service_type, instance_num)
     
     # continue
     continue_button(driver)
@@ -124,7 +123,7 @@ def create_from_image(driver, image_name='dao-2048', app_name='dao-2048-test', s
     if cpu_limit==[0.064, 0.128] and memory_limit==[256, 256]:
         pass
     else:
-        compute_info_setting(driver, cpu_limit, memory_limit)
+        compute_info_setting(driver, compute_info, cpu_limit, memory_limit)
     
     # continue
     continue_button(driver)
@@ -177,7 +176,7 @@ def continue_button(driver):
     bottom.find_element_by_class_name('dao-btn.blue').click()
    
    
-def app_info_setting(driver, app_info, app_name='dao-2048-test', service_type=0, instance_num=1):   
+def app_info_setting(driver, app_info, app_name='dao-2048-test', image_name='dao-2048', service_type=0, instance_num=1):   
    # 应用信息
     #4 layout： 选择名称，扩展，标签，注解
     
@@ -193,14 +192,14 @@ def app_info_setting(driver, app_info, app_name='dao-2048-test', service_type=0,
     input_app_name=choose_name_list[1].find_element_by_tag_name('input')
     sleep(2)
     input_app_name.clear()
-    input_app_name.send_keys(app_name)
+    input_app_name.send_keys(' ')
     input_app_name.clear()
     input_app_name.send_keys(app_name)
 
     # 服务名
     input_service_name=choose_name_list[2].find_element_by_tag_name('input')
     input_service_name.clear()
-    input_service_name.send_keys('dao-2048-test-dao-2048')
+    input_service_name.send_keys(app_name+'--'+image_name)
 
     # 服务类型： 0-无状态；1-有状态
     input_service_type=choose_name_list[3].find_elements_by_class_name('dao-radio-simple')
@@ -216,5 +215,28 @@ def app_info_setting(driver, app_info, app_name='dao-2048-test', service_type=0,
     
     ## 注解
     
+
+# 2-计算资源   #内存单位未选择
+def compute_info_setting(driver, compute_info, cpu_limit, memory_limit):
+    compute_limit=compute_info.find_elements_by_class_name('dark-form')
+    
+    cpu_input=compute_limit[0].find_elements_by_tag_name('input')
+    cpu_request_input, cpu_limit_input=cpu_input
+    cpu_request_input.clear()
+    #cpu_request_input.click()
+    cpu_request_input.send_keys(str(cpu_limit[0]))
+    cpu_limit_input.clear()
+    #cpu_limit_input.click()
+    cpu_limit_input.send_keys(str(cpu_limit[1]))
+    
+    memory_input=compute_limit[1].find_elements_by_tag_name('input')
+    memory_request_input, memory_limit_input=memory_input
+    memory_request_input.clear()
+    memory_request_input.send_keys(str(memory_limit[0]))
+    memory_limit_input.clear()
+    memory_limit_input.send_keys(str(memory_limit[1]))
     
     
+
+
+
