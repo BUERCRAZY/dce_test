@@ -2,7 +2,7 @@
 yum install -y expect
 echo "start to install DCE automatically"
 
-count=1
+
 nums=1
 clair=1
 level=2
@@ -59,57 +59,10 @@ then
   storage=${para:4:1}
   login=${para:5:1}
 
-else
-  echo "please confirm -p option network interface enter correctly"
-  exit
+#else
+#  echo "please confirm -p option network interface enter correctly"
+#  exit
 fi
-
-if [ $outbound !=  $internal ]
-then
-  count=count+1
-fi
-if [ $ovs != $internal ]
-then
-  count=count+1
-  if [ $ovs == $outbound ]
-  then
-    echo "interface for internal_ovs should be marked with internal, or one without any mark "
-    exit
-  fi
-fi
-
-if [ $calico != $internal ]
-then
-  count=count+1
-  if [ $calico == $outbound -o $calico == $ovs ]
-  then
-    echo "interface for calico should be marked with internal, or one without any mark"
-    exit
-  fi
-fi
-
-if [ $storage != $internal ]
-then
-  count=count+1
-  if [ $storage == $calico -o $storage == $outbound -o $storage == $ovs ]
-  then
-    echo "interface for storage should be marked with internal, or one without any mark"
-    exit
-  fi
-fi
-
-if [ $login != $outbound ]
-then
-  count=count+1
-  if [ $login == $storage -o $login == $calico -o $login == $outbound -o $login == $ovs ]
-  then
-    echo "interface for login should be marked with outbound, or one without any mark"
-    exit
-  fi
-fi
-
-
-
 
 if [[ $nums -lt 6 && $nums -gt 0 ]]
 then
@@ -120,47 +73,54 @@ else
 fi
 
 
+
 expect <<!
-set timeout 5
+set timeout -1
 spawn ./command.sh
 
-expect {
-  "Install DaoCloud Enterprise" {send "Y\r";exp_continue;}
-  "Please select network driver" {send "\r";exp_continue;}
-  "the system will be installed" {send "y\r";exp_continue}
-}
-expect {
-  "for 'internal_management' interface" {send "$internal\r";exp_continue}
-  "for 'outbound' interface" {send "$outbound\r";exp_continue}
-  "for 'internal_ovs' interface" {send "$ovs\r";exp_continue}
-  "for 'internal_calico' interface" {send "$calico\r";exp_continue}
-  "for 'internal_storage' interface" {send "$storage\r";exp_continue}
-  "for 'login' interface" {send "$login\r";exp_continue}
-  "please confirm the above information" {send "y\r";exp_continue}
-  "specify static route for accessing login subnet" {send "n\r";exp_continue}
-  "hit "n" key to ignore checking" {send "n\r";exp_continue}
-}
-expect { 
-  "HOST_NAME" {send "y\r";exp_continue}
-  "DNS_SERVER_LIST" {send "y\r";exp_continue}
-  "Install DaoCloud Enterprise" {send "Y\r";exp_continue}
-  "Please select network driver" {send "\r";exp_continue}
-  "the system will be installed" {send "y\r";exp_continue}
-}
-expect {
-  "Please select VIP provider solution" {send "$LB\r";exp_continue}
-  "Please specify controller VIP" {send "$vip\r";exp_continue}
-  "Please specify registry VIP" {send "$registry\r";exp_continue}
-  "Please select type of storage" {send "1\r";exp_continue}
-  "Please select image scan driver" {send "$clair\r";exp_continue}
-  "Please select cluster sizing" {send "$nums\r";exp_continue}
-  "Please select reliability_level level" {send "$level\r";exp_continue}
-}
-set timeout -1
-expect "Do you want to start DaoCloud Enterprise deployment now" 
+expect {Install DaoCloud Enterprise}
 send "Y\r"
+expect {Please select network driver}
+send "\r"
+expect {the system will be installed}
+send "y\r"
+
+expect {for 'internal_management' interface :}
+send "$internal\r"
+expect {for 'outbound' interface :}
+send "$outbound\r"
+expect {for 'internal_ovs' interface :}
+send "$ovs\r"
+expect {for 'internal_calico' interface :}
+send "$calico\r"
+expect {for 'internal_storage' interface :}
+send "$storage\r"
+expect {for 'login' interface :}
+send "$login\r"
+expect {please confirm the above information}
+send "y\r"
 
 
+expect {HOST_NAME}
+send "y\r"
+expect {DNS_SERVER_LIST}
+send "y\r"
+expect {Please select VIP provider solution}
+send "$LB\r"
+expect {Please specify controller VIP:}
+send "$vip\r"
+expect {Please specify registry VIP:}
+send "$registry\r"
+expect {Please select type of storage}
+send "1\r"
+expect {Please select image scan driver}
+send "$clair\r"
+expect {Please select cluster sizing}
+send "$nums\r"
+expect {Please select reliability_level level}
+send "$level\r"
+expect {Do you want to start DaoCloud Enterprise deployment now?}
+send "Y\r"
 
 expect eof
 !
